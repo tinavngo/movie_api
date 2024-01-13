@@ -15,6 +15,15 @@ const http = require('http');
       } else {
         filePath = 'index.html';
       }
+
+      //append for logging
+      fs.appendFile('log.txt', 'URL: ' + addr + '\nTimestamp: ' + new Date() + '\n\n', (err) => {
+        if (err) {
+          console.log('log error');
+        } else {
+          console.log('Added to log.');
+        }
+      });
     
       fs.readFile(filePath, (err, data) => {
         if (err) {
@@ -23,7 +32,7 @@ const http = require('http');
     
         response.writeHead(200, { 'Content-Type': 'text/html' });
         response.write(data);
-        response.end();
+        response.end("hello node");
     
       });
     
@@ -31,11 +40,3 @@ const http = require('http');
     
     .listen(8080);
     console.log('My test server is running on Port 8080.');
-
-http.createServer((request, response) => {
-response.writeHead(200, {'Content-Type' : 'text/plain'});
-response.end('Hello Node!\n');
-})
-.listen(8080);
-
-console.log('My first Node test server is running on Port 8080.')
