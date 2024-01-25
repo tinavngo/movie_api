@@ -3,8 +3,159 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>MyFlix Documentation</title>
     </head>
     <body>
+        <h1>MyFlix API</h1>
+        <h3>Version 1.0.0</h3>
+        <br>
+        <p>Users are able to review movie details with this web application. This web application allows users to access genres, directors, release dates, and concise descriptions for a seamless cinematic experience.
+        In addition, users are able to create and update their account with a list of their favorite movies!</p>
+        <h2> Documentation </h2>
+        <table>
+            <thead>
+                <tr>
+                    <td>Objective</td>
+                    <td>URL</td>
+                    <td>HTTP Method</td>
+                    <td>Request body data format</td>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+                    <td>Response body data format</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Return data of all movies</td>
+                    <td>/movies</td>
+                    <td>GET/READ</td>
+                    <td>None</td>
+                    <td>A JSON object holding data about all movies and directors</td>
+                </tr>
+                <tr>
+                    <td>Return data of movie by title</td>
+                    <td>/movies/:title</td>
+                    <td>GET/READ</td>
+                    <td>None</td>
+                    <td>A JSON object that holds data about a single movie. <br> Example:
+                        <code>
+                            {
+                                "Title": "Perfect Blue",
+                                "Description": "A young Japanese singer is encouraged by her agent to quit singing and pursue an acting career, beginning with a role in a murder mystery TV show.",
+                                "Genre": {
+                                    "Name": "Mystery",
+                                    "Description": "A mystery film is a genre of film that revolves around the solution of a problem or a crime."
+                                },
+                                "Director": {
+                                    "Name": "Satoshi Kon",
+                                    "Bio": "Satoshi Kon was a Japanese film director, animator, screenwriter and manga artist from Sapporo, Hokkaido, and a member of the Japanese Animation Creators Association. He was a graduate of the Graphic Design department of the Musashino Art University.",
+                                    "Birth": "October 12, 1963 - August 24, 2010"
+                                },
+                                "releaseDate": "August 20, 1999"
+                            }
+                        </code>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Return genre data by name</td>
+                    <td>/movies/genre/:genreName</td>
+                    <td>GET/READ</td>
+                    <td>None</td>
+                    <td>A JSON object holding data about a single genre, containing genre name, description. <br> Example:
+                        <code>
+                            {
+                                "Name": "Horror",
+                                "Description": "Horror is a film genre that seeks to elicit fear or disgust in its audience for entertainment purposes."
+                            }
+                        </code>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Return data of director (Name, Bio, Birth) by name</td>
+                    <td>/movies/director/:directorName</td>
+                    <td>GET/READ</td>
+                    <td>None</td>
+                    <td>a JSON object holding data about a single director, containing director name, bio, birth, and death year. <br> Example:
+                    <code>
+                        {
+                        "Name": "Quentin Tarantino",
+                        "Bio": "Quentin Jerome Tarantino is an American film director, screenwriter, and actor. His films are characterized by stylized violence, extended dialogue including a pervasive use of profanity, and references to popular culture.",
+                        "Birth": "March 27, 1963"
+                        }
+                </code>
+            </td>
+                </tr>
+                <tr>
+                    <td>Add a new user</td>
+                    <td>/users</td>
+                    <td>POST/CREATE</td>
+                    <td>A JSON object holding data about the user to add, <br> Example:
+                        <code>
+                            {
+                                "name" : "Justine",
+                                "favoriteMovies": []
+                            }
+                        </code>
+                    </td>
+                    <td>A JSON object holding data about the user that was added, including an ID. <br> Example:
+                        <code>
+                            {
+                                "name": "Justine",
+                                "favoriteMovies": [],
+                                "id": "4c4aabab-7bc8-4a3d-896b-9ac5001d33b0"
+                            }
+                        </code>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Allow users to update their user data</td>
+                    <td>/users/:id</td>
+                    <td>PUT/UPDATE</td>
+                    <td>A JSON object that requests data to add in order to update the user info <br> Example:
+                    <code>
+                        {
+                            "name" : "Kim updated Name",
+                            "favoriteMovies": []
+                        }
+                    </code>
+                </td>
+                <td>A JSON object holding data about the updated user information <br> Example:
+                <code>
+                    {
+                        "id": 2,
+                        "name": "Kim updated Name",
+                        "favoriteMovies": []
+                    }
+                </code>
+            </td>
+                </tr>
+                <tr>
+                    <td>Allow users to add their favorite movies</td>
+                    <td>/users/:id/:movieTitle</td>
+                    <td>POST/CREATE</td>
+                    <td>None</td>
+                    <td>Text indicating if POST was successful. <br> Example:
+                        Perfect Blue has been added to user 2's array
+                    </td>
+                </tr>
+                <tr>
+                    <td>Remove movie from favorites list</td>
+                    <td>/users/:id/:movieTitle</td>
+                    <td>DELETE</td>
+                    <td>None</td>
+                    <td>
+                      Text indicating if the movie was successfully removed
+                      from the user's favorited movies. <br> Example:
+                      Perfect Blue has been removed from user 2's array
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Allow users to deregister</td>
+                    <td>/users/:id</td>
+                    <td>DELETE</td>
+                    <td>None</td>
+                    <td>Text indicating if user deregistration was successful. <br> Example:
+                         Perfect Blue has been removed from user 2's array</td>
+                  </tr>
+            </tbody>
+        </table>
       </body>
 </html>
