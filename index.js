@@ -202,8 +202,9 @@ app.delete('/users/:id', (req, res) => {
 
 // READ aka GET requests
 app.get("/", (req, res) => {
-  let responseText = "Welcome to myFlix app!";
-  res.send(responseText);
+  // let responseText = "Welcome to myFlix app!";
+  // res.send(responseText);
+  res.sendFile(__dirname + '/public/documentation.html');
 });
 
 //READ
