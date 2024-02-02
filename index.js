@@ -31,7 +31,7 @@ let movies = [
 
     'Genre': {
       'Name' : "Horror",
-      'Description' : "Horror is a film genre that seeks to elicit fear or disgust in its audience for entertainment purposes",
+      'Description' : "Horror is a film genre that seeks to elicit fear or disgust in its audience for entertainment purposes.",
     },
 
     'Director': {
