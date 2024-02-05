@@ -16,10 +16,9 @@ const Users = Models.User;
 //const Genres = Models.Genre;
 //const Directors = Models.Director;
 
-mongoose.connect('mongodb://localhost:27017/myFlix', 
-{
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+mongoose.connect('mongodb://127.0.0.1:27017/myFlix', {
+  useNewUrlParser: true,        // Deprecated, but still supported
+  useUnifiedTopology: true,    // Deprecated, but still supported
 });
 
 //JSON middleware body parser for requests
