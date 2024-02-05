@@ -21,6 +21,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/myFlix', {
   useUnifiedTopology: true,    // Deprecated, but still supported
 });
 
+
 //JSON middleware body parser for requests
 app.use(express.urlencoded({ extended: true}));
 app.use(bodyParser.json());
@@ -157,7 +158,7 @@ app.delete('/users/:Username/movies/:MovieID', (req, res) => {
 
 //DELETE a user by username
 app.delete('/users/:Username', async (req, res) => {
-  await Users.findOneAndRemove ({ Username: req.params.Username})
+  await Users.findOneAndDelete({ Username: req.params.Username})
   .then((user) => {
     if (!user) {
       res.status(400).send(req.params.Username + 'was not found');
@@ -192,7 +193,7 @@ app.get("/movies", async (req, res) => {
 
 //READ
 app.get("/movies/:title", async (req, res) => {
- await Movies.findOne({ title: req.params.title })
+ await Movies.findOne({ Title: req.params.title })
  .then((movie) => {
   res.json(movie);
  })
@@ -216,7 +217,7 @@ app.get("/movies/genre/:genreName", async (req, res) => {
 
 //READ
 app.get("/movies/director/:directorName", async (req, res) => {
-  await Movies.findOne({ "Director.NAme": req.params.directorName })
+  await Movies.find({ "Director.Name": req.params.directorName })
   .then((movies) => {
     res.json(movies);
   })
