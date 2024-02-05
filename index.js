@@ -131,19 +131,28 @@ app.post('/users/:Username/movies/:MovieID', async (req, res) => {
   });
 });
 
-//DELETE
-app.delete('/users/:id/:movieTitle', (req, res) => {
-  const { id, movieTitle } = req.params;
-  
-  const user = Users.find( user => user.id == id );
 
-  if (user) {
-    user.favoriteMovies = user.favoriteMovies.filter( title => title !== movieTitle); //strict equality, if not equal to, then do not show/remove
-    res.status(200).send(`${movieTitle} has been removed from user ${id}'s array`);
-  } else {
-    res.status(400).send('no such user')
-  }
-})
+//allows users to delete movies from their favorites
+app.delete('/users/:Username/movies/:MovieID', (req, res) => {
+  Users.findOneAndUpdate(
+    { Username: req.params.Username },
+    {
+      $pull: { FavoriteMovies: req.params.MovieID }
+    },
+    { new: true }
+  )
+    .then((updatedUser) => {
+      if (!updatedUser) {
+        return res.status(404).send("Error: User doesn't exist");
+      } else {
+        res.json(updatedUser);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
 
 
 //DELETE a user by username
