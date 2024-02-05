@@ -24,11 +24,25 @@
             </thead>
             <tbody>
                 <tr>
+                    <td>Return data of all users</td>
+                    <td>/users</td>
+                    <td>GET/READ</td>
+                    <td>None</td>
+                    <td>A JSON object holding all data about all users</td>
+                </tr>
+                <tr>
                     <td>Return data of all movies</td>
                     <td>/movies</td>
                     <td>GET/READ</td>
                     <td>None</td>
                     <td>A JSON object holding data about all movies and directors</td>
+                </tr>
+                <tr>
+                    <td>Return data of movie by director name</td>
+                    <td>/movies/director/:directorName</td>
+                    <td>GET/READ</td>
+                    <td>None</td>
+                    <td>A JSON object thats holds data about movies with director name</td>
                 </tr>
                 <tr>
                     <td>Return data of movie by title</td>
@@ -73,7 +87,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Return data of director (Name, Bio, Birth) by name</td>
+                    <td>Return data of director by name (Name, Bio, Birth) by name</td>
                     <td>/movies/director/:directorName</td>
                     <td>GET/READ</td>
                     <td>None</td>
@@ -111,7 +125,7 @@
                 </tr>
                 <tr>
                     <td>Allow users to update their user data</td>
-                    <td>/users/:id</td>
+                    <td>/users/:Username</td>
                     <td>PUT/UPDATE</td>
                     <td>A JSON object that requests data to add in order to update the user info <br> Example:
                     <code>
@@ -133,16 +147,16 @@
                 </tr>
                 <tr>
                     <td>Allow users to add their favorite movies</td>
-                    <td>/users/:id/:movieTitle</td>
+                    <td>/users/:Username/movies/:MovieID</td>
                     <td>POST/CREATE</td>
                     <td>None</td>
                     <td>Text indicating if POST was successful. <br> Example:
-                        Perfect Blue has been added to user 2's array
+                       "FavoriteMovies" : ["283hrf9829f87dg80"]
                     </td>
                 </tr>
                 <tr>
                     <td>Remove movie from favorites list</td>
-                    <td>/users/:id/:movieTitle</td>
+                    <td>/users/:Username/movies/:MovieID</td>
                     <td>DELETE</td>
                     <td>None</td>
                     <td>
@@ -153,11 +167,11 @@
                   </tr>
                   <tr>
                     <td>Allow users to deregister</td>
-                    <td>/users/:id</td>
+                    <td>/users/:Username</td>
                     <td>DELETE</td>
                     <td>None</td>
                     <td>Text indicating if user deregistration was successful. <br> Example:
-                         Perfect Blue has been removed from user 2's array</td>
+                         testuser1083 was deleted</td>
                   </tr>
             </tbody>
         </table>
