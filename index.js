@@ -26,7 +26,10 @@ mongoose.connect('mongodb://127.0.0.1:27017/myFlix', {
 app.use(express.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
-//app.use(bodyParser.urlendcoded({ extended: true}));
+//importing authentication middleware
+let auth = require('./auth')(app);
+const passport = require('passport');
+require('./passport');
 
 //Avoiding long list of res.sendFile()
 //app.use(express.static('public'));
@@ -37,6 +40,18 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {f
 
 // log request setup
 //app.use(morgan('combined', {stream: accessLogStream}));
+
+//READ
+app.get('/movies', passport.authenticate('jwt', {session: false }), async (req, res) => {
+  await Movies.find()
+  .then((movies) => {
+    res.status(201).json(movies);
+  })
+  .catch((error) => {
+    console.error(error);
+    res.status(500).send('Error: ' + error);
+  });
+});
 
 //CREATE
 app.post('/users', async (req, res) => {
@@ -91,25 +106,30 @@ app.get('/users/:Username', async (req, res) => {
 });
 
 //UPDATE a user's info, by username
-app.put('/users/:Username', async (req, res) => {
-  await Users.findOneAndUpdate({ Username: req.params.Username }, 
-    {$set: {
-
+app.put('/users/:Username', passport.authenticate('jwt', { session: false}),
+async (req, res) => {
+  //CONDITION TO CHECK ADDED HERE
+  if(req.user.Username !== req.params.Username) {
+    return res.status(400).send('Permission denied');
+  }
+  //CONDITION ENDS
+  await Users.findOneAndUpdate({ Username: req.params.Username}, {
+    $set:
+    {
       Username: req.body.Username,
       Password: req.body.Password,
       Email: req.body.Email,
       Birthday: req.body.Birthday
-
-  }
-},
-{ new: true}) // This line makes sure that the updated document is returned
-.then((updatedUser) => {
-  res.json(updatedUser);
-})
-.catch((err) => {
-  console.error(err);
-  res.status(500).send('Error: ' + err);
-})
+    }
+  },
+     { new: true}) //This line makes sure that the updated document is returned
+     .then((updatedUser) => {
+      res.json(updatedUser);
+     })
+     .catch((err) => {
+      console.log(err);
+      res.status(500).send('Error: ' + err);
+     })
 });
 
 
@@ -178,17 +198,6 @@ app.get("/", (req, res) => {
   res.send(responseText);
 });
 
-//READ return JSON object when at /movies
-app.get("/movies", async (req, res) => {
-  await Movies.find()
-  .then((movies) => {
-    res.status(201).json(movies);
-  })
-  .catch((err) => {
-    console.error(err);
-    res.status(500).send("Error: " + err);
-  });
-});
 
 
 //READ
