@@ -6,15 +6,21 @@ const express = require('express'),
  app = express();
  uuid = require('uuid');
 
-//importing models.js file + mongoose
+ const {check, validationResult } = require('express-validator');
+
+ // cross origin source
+const cors = require('cors');
+app.use(cors());
+
+// importing models.js file + mongoose
  const mongoose = require('mongoose');
 const Models = require('./models.js');
 const { error } = require('console');
 
 const Movies = Models.Movie;
 const Users = Models.User;
-//const Genres = Models.Genre;
-//const Directors = Models.Director;
+// const Genres = Models.Genre;
+// const Directors = Models.Director;
 
 mongoose.connect('mongodb://127.0.0.1:27017/myFlix', {
   useNewUrlParser: true,        // Deprecated, but still supported
@@ -22,26 +28,26 @@ mongoose.connect('mongodb://127.0.0.1:27017/myFlix', {
 });
 
 
-//JSON middleware body parser for requests
+// JSON middleware body parser for requests
 app.use(express.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
-//importing authentication middleware
+// importing authentication middleware
 let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
 
-//Avoiding long list of res.sendFile()
-//app.use(express.static('public'));
+// Avoiding long list of res.sendFile()
+// app.use(express.static('public'));
 
 // create a write stream (in append mode)
 // a ‘log.txt’ file is created in root directory
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {flags: 'a'})
 
 // log request setup
-//app.use(morgan('combined', {stream: accessLogStream}));
+// app.use(morgan('combined', {stream: accessLogStream}));
 
-//READ
+// READ
 app.get('/movies', passport.authenticate('jwt', {session: false }), async (req, res) => {
   await Movies.find()
   .then((movies) => {
@@ -53,12 +59,30 @@ app.get('/movies', passport.authenticate('jwt', {session: false }), async (req, 
   });
 });
 
-//CREATE
-app.post('/users', async (req, res) => {
-  await Users.findOne({ Username: req.body.Username })
+// CREATE account for new users
+app.post('/users' [
+
+  // Validation logic here for request
+  check('Username', 'Username is required').isLength({min: 5}),
+  check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+  check('Password', 'Password is required').not().isEmpty(),
+  check('Email', 'Email does not appear to be valid').isEmail()
+
+], async (req, res) => {
+
+  // check the validation object for errors
+  let errors = validationResult(req);
+  if (!errors,isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+  
+  //hashpassword as user enters
+  let hashedPassword = Users.hashPassword(req.body.Password);
+  await Users.findOne({ Username: req.body.Username }) //Search to see if a user with the requested username already exists
   .then ((user) => {
     if 
     (user) {
+      // If the user is found, send a response that it already exists
       return res.status(400).send(req.body.Username + 'already exists');
     } else {
       Users
