@@ -81,11 +81,11 @@ app.post('/users', [
 
   // check the validation object for errors
   let errors = validationResult(req);
-  if (!errors,isEmpty()) {
+  if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
   
-  //hashpassword as user enters
+  // hashpassword as user enters
   let hashedPassword = Users.hashPassword(req.body.Password);
   await Users.findOne({ Username: req.body.Username }) //Search to see if a user with the requested username already exists
   .then ((user) => {
