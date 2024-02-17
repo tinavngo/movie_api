@@ -22,9 +22,18 @@ const Users = Models.User;
 // const Genres = Models.Genre;
 // const Directors = Models.Director;
 
+/*
+//local database
 mongoose.connect('mongodb://127.0.0.1:27017/myFlix', {
-  useNewUrlParser: true,        // Deprecated, but still supported
-  useUnifiedTopology: true,    // Deprecated, but still supported
+  useNewUrlParser: true,        
+  useUnifiedTopology: true,    
+});
+*/
+
+// Online database
+mongoose.connect(process.env.CONNECTION_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
 
@@ -60,7 +69,7 @@ app.get('/movies', passport.authenticate('jwt', {session: false }), async (req, 
 });
 
 // CREATE account for new users
-app.post('/users' [
+app.post('/users', [
 
   // Validation logic here for request
   check('Username', 'Username is required').isLength({min: 5}),
@@ -264,7 +273,7 @@ app.get("/movies/director/:directorName", async (req, res) => {
 //should be last, but before app.listen()
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send("something broke");
+  res.status(500).send("something broke!");
 });
 
 // listen for requests
