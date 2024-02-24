@@ -31,7 +31,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/myFlix', {
 */
 
 // Online database
-mongoose.connect(process.env.CONNECTION_URI, {
+mongoose.connect('process.env.CONNECTION_URI', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
