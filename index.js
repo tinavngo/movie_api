@@ -19,8 +19,7 @@ const { error } = require('console');
 
 const Movies = Models.Movie;
 const Users = Models.User;
-// const Genres = Models.Genre;
-// const Directors = Models.Director;
+const Directors = Models.Director;
 
 /*
 //local database
