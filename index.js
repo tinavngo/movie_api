@@ -331,6 +331,13 @@ app.get(
   });
 });
 
+// Static file
+app.use(
+  "/documentation",
+  express.static("public", { index: "documentation.html" })
+);
+
+// Error handling middleware function
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("something broke!");
