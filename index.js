@@ -79,6 +79,7 @@ app.get(
 // READ -- Get directors must auth  x
 app.get(
   "/movies/directors",
+  passport.authenticate("jwt", { session : false }),
   async (req, res) =>  {
     await Directors.find()
     .then((director) => {
@@ -94,6 +95,7 @@ app.get(
 // READ -- Get movie title must auth x
 app.get(
   "/movies/:title",
+  passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     await Movies.findOne({ Title: req.params.title })
     .then((movie) => {
@@ -109,6 +111,7 @@ app.get(
 // READ -- Get movies genre must auth x
 app.get(
   "/movies/genre/:genre",
+  passport.authenticate("jwt",  { session : false }),
   async (req, res) => {
     await Movies.find({ Genre: req.params.genre })
     .then((movie) => {
@@ -128,6 +131,7 @@ app.get(
 // READ -- Get users must auth x
 app.get(
   "/users",
+  passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     await Users.find()
     .then((users) => {
@@ -225,6 +229,7 @@ async (req, res) => {
 //CREATE Add a movie to a user's list of favorites must auth x
 app.post(
   '/users/:Username/movies/:title',
+  passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     await Movies.findOne({Title: req.params.title})
     .then( async (movie) => {
@@ -276,6 +281,7 @@ app.delete(
 //DELETE a user by username must auth x
 app.delete(
   '/users/:Username',
+  passport.authenticate("jwt", { session: false}),
   async (req, res) => {
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission denied");
@@ -298,6 +304,7 @@ app.delete(
 //READ -- Get genre by genrename must auth x
 app.get(
   "/movies/genre/:genreName",
+  passport.authenticate("jwt", { session: false}),
   async (req, res) => {
   await Movies.findOne({ "Genre.Name": req.params.genreName })
   .then((movies) => {
@@ -312,6 +319,7 @@ app.get(
 //READ -- Get director by directorname must auth x
 app.get(
   "/movies/director/:directorName", 
+  passport.authenticate("jwt", { session: false}),
   async (req, res) => {
   await Movies.find({ "Director.Name": req.params.directorName })
   .then((movies) => {
