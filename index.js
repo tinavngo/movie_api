@@ -18,7 +18,7 @@ const Directors = Models.Director;
 
 /*
 //local database
-mongoose.connect('mongodb://127.0.0.1:27017/myFlix', {useNewUrlParser: true, useUnifiedTopology: true);
+mongoose.connect('mongodb://127.0.0.1:27017/myFlix', {useNewUrlParser: true, useUnifiedTopology: true});
 */
 
 // Online database
@@ -108,9 +108,9 @@ app.get(
   }
 );
 
-// READ -- Get movies genre must auth x
+ // READ -- Get movies genre must auth x
 app.get(
-  "/movies/genre/:genre",
+  "/movies/genres/:genre",
   passport.authenticate("jwt",  { session : false }),
   async (req, res) => {
     await Movies.find({ Genre: req.params.genre })
@@ -126,7 +126,8 @@ app.get(
       res.status(500).send("Error: " + err);
     });
   }
-);
+); 
+
 
 // READ -- Get users must auth x
 app.get(
@@ -177,7 +178,7 @@ app.post(
       .then ((user) => {res.status(201).json(user) })
       .catch((error) => {
         console.error(error);
-        res.status(500).send('Erorr: ' + error);
+        res.status(500).send('Error: ' + error);
       })
     }
   })
@@ -190,6 +191,7 @@ app.post(
 //UPDATE a user's info, by username  must auth x
 app.put(
 '/users/:Username',
+passport.authenticate('jwt', { session: false}),
 [
   // Validation logic here for request
   check('Username', 'Username is required').isLength({min: 5}),
@@ -197,7 +199,7 @@ app.put(
   check('Password', 'Password is required').not().isEmpty(),
   check('Email', 'Email does not appear to be valid').isEmail()
 ], 
-passport.authenticate('jwt', { session: false}),
+
 async (req, res) => {
   //CONDITION TO CHECK ADDED HERE
   if(req.user.Username !== req.params.Username) {
@@ -205,7 +207,6 @@ async (req, res) => {
   }
 
   let hashedPassword = Users.hashPassword(req.body.Password);
-
   await Users.findOneAndUpdate({ Username: req.params.Username}, {
     $set:
     {
@@ -303,12 +304,12 @@ app.delete(
 
 //READ -- Get genre by genrename must auth x
 app.get(
-  "/movies/genre/:genreName",
+  "/movies/genres/:genreName",
   passport.authenticate("jwt", { session: false}),
   async (req, res) => {
   await Movies.findOne({ "Genre.Name": req.params.genreName })
   .then((movies) => {
-    res.json(movies);
+    res.json(movies.Genre);
   })
   .catch((err) => {
     console.error(err);
@@ -318,7 +319,7 @@ app.get(
 
 //READ -- Get director by directorname must auth x
 app.get(
-  "/movies/director/:directorName", 
+  "/movies/directors/:directorName", 
   passport.authenticate("jwt", { session: false}),
   async (req, res) => {
   await Movies.find({ "Director.Name": req.params.directorName })
