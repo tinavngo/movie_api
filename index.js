@@ -64,7 +64,6 @@ app.get(
 // READ -- Get movies must auth x
 app.get(
   '/movies',
-  passport.authenticate('jwt', {session: false }), 
   async (req, res) => {
   await Movies.find()
   .then((movies) => {
