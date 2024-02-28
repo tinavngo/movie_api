@@ -64,7 +64,6 @@ app.get(
 // READ -- Get movies must auth x
 app.get(
   '/movies',
-  passport.authenticate('jwt', {session: false }), 
   async (req, res) => {
   await Movies.find()
   .then((movies) => {
@@ -107,8 +106,13 @@ app.get(
     });
   }
 );
+<<<<<<< Updated upstream
 
 // READ -- Get movies genre must auth x
+=======
+/*
+ // READ -- Get movies genre must auth x
+>>>>>>> Stashed changes
 app.get(
   "/movies/genre/:genre",
   passport.authenticate("jwt",  { session : false }),
@@ -126,7 +130,12 @@ app.get(
       res.status(500).send("Error: " + err);
     });
   }
+<<<<<<< Updated upstream
 );
+=======
+); */
+
+>>>>>>> Stashed changes
 
 // READ -- Get users must auth x
 app.get(
