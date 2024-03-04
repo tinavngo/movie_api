@@ -75,22 +75,6 @@ app.get(
   });
 });
 
-// READ -- Get directors must auth  x
-app.get(
-  "/movies/directors",
-  passport.authenticate("jwt", { session : false }),
-  async (req, res) =>  {
-    await Directors.find()
-    .then((director) => {
-      res.status(201).json(director);
-    })
-    .catch((err) =>  {
-      console.error(err);
-      res.status(500).send("Error: " + err);
-    });
-  }
-);
-
 // READ -- Get movie title must auth x
 app.get(
   "/movies/:title",
@@ -106,27 +90,6 @@ app.get(
     });
   }
 );
-
- // READ -- Get movies genre must auth x
-app.get(
-  "/movies/genres/:genre",
-  passport.authenticate("jwt",  { session : false }),
-  async (req, res) => {
-    await Movies.find({ Genre: req.params.genre })
-    .then((movie) => {
-      if (!movie.length) {
-        res.status(400).send(req.params.genre + " movies were not found. ");
-      } else {
-        res.json(movie);
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send("Error: " + err);
-    });
-  }
-); 
-
 
 // READ -- Get users must auth x
 app.get(
@@ -333,9 +296,9 @@ app.get(
   "/movies/genres/:genreName",
   passport.authenticate("jwt", { session: false}),
   async (req, res) => {
-  await Movies.findOne({ "Genre.Name": req.params.genreName })
+  await Movies.find({ "Genre.Name": req.params.genreName })
   .then((movies) => {
-    res.json(movies.Genre);
+    res.json(movies);
   })
   .catch((err) => {
     console.error(err);
