@@ -14,7 +14,7 @@ const { error } = require('console');
 
 const Movies = Models.Movie;
 const Users = Models.User;
-const Directors = Models.Director;
+
 
 /*
 //local database
@@ -43,8 +43,10 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {f
 app.use(morgan('combined', {stream: accessLogStream}));
 app.use(bodyParser.json());
 
-
+// Import auth.jsc
 let auth = require('./auth')(app);
+
+// Import passport and passport.js
 const passport = require('passport');
 require('./passport');
 
@@ -150,7 +152,7 @@ app.post(
   })
 });
 
-//UPDATE a user's info, by username  must auth x
+//UPDATE -- user's info, by username  must auth x
 app.put(
 '/users/:Username',
 passport.authenticate('jwt', { session: false}),
@@ -188,7 +190,7 @@ async (req, res) => {
      })
 });
 
-// READ all users
+// READ -- all users
 app.get('/users', 
 passport.authenticate('jwt', { session: false }), 
 async (req, res) => {
@@ -202,7 +204,7 @@ async (req, res) => {
       });
 });
 
-// READ a user by username
+// READ -- user by username
 app.get('/users/:Username', 
 passport.authenticate('jwt', { session: false }), 
 async (req, res) => {
@@ -216,25 +218,26 @@ async (req, res) => {
       });
 });
 
-//CREATE Add a movie to a user's list of favorites must auth x
+//CREATE -- favorite movies
 app.post(
-  '/users/:Username/movies/:title',
+  '/users/:Username/movies/:MovieID',
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    await Movies.findOne({Title: req.params.title})
-    .then( async (movie) => {
-      if (!movie) {
-        return res.status(404).json({error: "Movie not found"});
-      }
+    if(req.user.Username !== req.params.Username) {
+      return res.status(400).send('Permission denied');
+    }
   await Users.findOneAndUpdate (
-    { Username: req.params.Username }, 
-    { $push: { FavoriteMovies: req.params.MovieID } },
-  { new: true }// Makes sure that the updated document is returned
-  )
+    { Username: req.params.Username }, {
+       $push: { FavoriteMovies: req.params.MovieID } 
+  },
+  { new: true })// Makes sure that the updated document is returned
   .then((updatedUser) => {
+    if (!updatedUser) {
+      return res.status(404).send("Error: User doesn't exist");
+    } else {
     res.json(updatedUser);
+    }
   })
-})
   .catch((err) => {
     console.error(err);
     res.status(500).send('Error: ' + err);
@@ -242,18 +245,19 @@ app.post(
 });
 
 
-//allows users to delete movies from their favorites must auth x
+// DELETE -- favorite movies
 app.delete(
-  '/users/:Username/movies/:title',
+  '/users/:Username/movies/:MovieID',
   passport.authenticate("jwt", { session: false }),
-   (req, res) => {
-  Users.findOneAndUpdate(
-    { Username: req.params.Username },
-    {
+   async (req, res) => {
+    if(req.user.Username !== req.params.Username) {
+      return res.status(400).send('Permission denied');
+    }
+  await Users.findOneAndUpdate(
+    { Username: req.params.Username },{
       $pull: { FavoriteMovies: req.params.MovieID }
     },
-    { new: true }
-  )
+    { new: true }) // This line makes sure that the updated document is returned
     .then((updatedUser) => {
       if (!updatedUser) {
         return res.status(404).send("Error: User doesn't exist");
