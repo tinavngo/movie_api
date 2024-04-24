@@ -136,21 +136,21 @@ app.get(
 // CREATE -- account for new users x
 app.post(
   '/users', (req, res) => {
-  [   // Validation logic here for request
-    check('Username', 'Username is required').isLength({ min: 5 }),
-    check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
-    check('Password', 'Password is required').not().isEmpty(),
-    check('Email', 'Email does not appear to be valid').isEmail()
-  ],
-   (req, res) => {
-    let errors = validationResult(req); // check the validation object for errors
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
-    }
-  }
+    [   // Validation logic here for request
+      check('Username', 'Username is required').isLength({ min: 5 }),
+      check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+      check('Password', 'Password is required').not().isEmpty(),
+      check('Email', 'Email does not appear to be valid').isEmail()
+    ],
+      (req, res) => {
+        let errors = validationResult(req); // check the validation object for errors
+        if (!errors.isEmpty()) {
+          return res.status(422).json({ errors: errors.array() });
+        }
+      }
 
-    let hashedPassword = 
-    Users.hashPassword(req.body.Password); // hashpassword as user enters
+    let hashedPassword =
+      Users.hashPassword(req.body.Password); // hashpassword as user enters
     Users.findOne({ Username: req.body.Username }) //Search to see if a user with the requested username already exists
       .then((user) => {
         if (user) {
@@ -200,7 +200,7 @@ app.put(
       }
       
     let hashedPassword = Users.hashPassword(req.body.Password);
-     Users.findOneAndUpdate({ Username: req.params.Username }, {
+    Users.findOneAndUpdate({ Username: req.params.Username }, {
       $set:
       {
         Username: req.body.Username,
@@ -210,19 +210,19 @@ app.put(
       },
     },
       { new: true }, //This line makes sure that the updated document is returned
-    ) 
+    )
       .then((updatedUser) => {
-      if (!updatedUser) {
+        if (!updatedUser) {
+          console.error(err);
+          return res.status(404).send('Error: Username already exists');
+        } else {
+          res.json(updatedUser);
+        }
+      })
+      .catch((err) => {
         console.error(err);
-        return res.status(404).send('Error: Username already exists');
-      } else {
-        res.json(updatedUser);
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send('Error: ' + err);
-    });
+        res.status(500).send('Error: ' + err);
+      });
   });
 
 // READ -- all users
