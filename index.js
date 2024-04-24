@@ -37,6 +37,7 @@ app = express();
 /**
  * Middleware to parse incoming request bodies as JSON
  */
+app.use(morgan('common'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -134,29 +135,30 @@ app.get(
 
 // CREATE -- account for new users x
 app.post(
-  '/users',
+  '/users', (req, res) => {
   [   // Validation logic here for request
     check('Username', 'Username is required').isLength({ min: 5 }),
     check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
     check('Password', 'Password is required').not().isEmpty(),
     check('Email', 'Email does not appear to be valid').isEmail()
   ],
-  async (req, res) => {
+   (req, res) => {
     let errors = validationResult(req); // check the validation object for errors
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
+  }
 
-    let hashedPassword = Users.hashPassword(req.body.Password); // hashpassword as user enters
-    await Users.findOne({ Username: req.body.Username }) //Search to see if a user with the requested username already exists
+    let hashedPassword = 
+    Users.hashPassword(req.body.Password); // hashpassword as user enters
+    Users.findOne({ Username: req.body.Username }) //Search to see if a user with the requested username already exists
       .then((user) => {
-        if
-          (user) {
+        if (user) {
           // If the user is found, send a response that it already exists
           return res.status(400).send(req.body.Username + 'already exists');
         } else {
           Users
-            .create({
+            .create({ // Mongoose's create command creates a new user if username is not already in DB 
               Username: req.body.Username,
               Password: hashedPassword,
               Email: req.body.Email,
@@ -179,6 +181,7 @@ app.post(
 app.put(
   '/users/:Username',
   passport.authenticate('jwt', { session: false }),
+  (req, res) => {
   [
     // Validation logic here for request
     check('Username', 'Username is required').isLength({ min: 5 }),
@@ -187,14 +190,16 @@ app.put(
     check('Email', 'Email does not appear to be valid').isEmail()
   ],
 
-  async (req, res) => {
+   (req, res) => {
     //CONDITION TO CHECK ADDED HERE
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send('Permission denied');
     }
 
+  }
+
     let hashedPassword = Users.hashPassword(req.body.Password);
-    await Users.findOneAndUpdate({ Username: req.params.Username }, {
+     Users.findOneAndUpdate({ Username: req.params.Username }, {
       $set:
       {
         Username: req.body.Username,
@@ -203,14 +208,20 @@ app.put(
         Birthday: req.body.Birthday
       },
     },
-      { new: true }) //This line makes sure that the updated document is returned
+      { new: true }, //This line makes sure that the updated document is returned
+    ) 
       .then((updatedUser) => {
+      if (!updatedUser) {
+        console.error(err);
+        return res.status(404).send('Error: Username already exists');
+      } else {
         res.json(updatedUser);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send('Error: ' + err);
-      })
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
   });
 
 // READ -- all users
