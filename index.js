@@ -205,7 +205,7 @@ app.put(
       }
       
       req.body.Password && (data.Password = Users.hashPassword(req.body.Password));
-      
+
       Users.findOneAndUpdate(
         {Username: req.params.Username},
         { $set: data },
@@ -311,16 +311,16 @@ app.delete(
 app.delete(
   '/users/:Username',
   passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+   async (req, res) => { 
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission denied");
     }
-    await Users.findOneAndDelete({ Username: req.params.Username })
+     await Users.findOneAndDelete({ Username: req.params.Username })
       .then((user) => {
         if (!user) {
-          res.status(400).send(req.params.Username + 'was not found');
+          res.status(400).send(req.params.Username + ' was not found');
         } else {
-          res.status(400).send(req.params.Username + 'was deleted.');
+          res.status(400).send(req.params.Username + ' was deleted.');
         }
       })
       .catch((err) => {
