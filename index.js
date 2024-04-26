@@ -198,18 +198,18 @@ app.put(
           return res.status(422).json({ errors: errors.array() });
         }
       }
-      
-    let hashedPassword = Users.hashPassword(req.body.Password);
-    Users.findOneAndUpdate({ Username: req.params.Username }, {
-      $set:
-      {
+      let data = {
         Username: req.body.Username,
-        Password: hashedPassword,
         Email: req.body.Email,
         Birthday: req.body.Birthday
-      },
-    },
-      { new: true }, //This line makes sure that the updated document is returned
+      }
+      
+      req.body.Password && (data.Password = Users.hashPassword(req.body.Password));
+      
+      Users.findOneAndUpdate(
+        {Username: req.params.Username},
+        { $set: data },
+        { new: true }, //This line makes sure that the updated document is returned
     )
       .then((updatedUser) => {
         if (!updatedUser) {
