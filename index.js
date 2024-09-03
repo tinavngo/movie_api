@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
  * Cross Origin Resource Sharing
  */
 const cors = require('cors');
-let allowedOrigins = ['http://localhost:8080', 'http://localhost:1234', 'https://cinematflix.netlify.app']
+let allowedOrigins = ['http://localhost:8080', 'http://localhost:1234', 'https://cinematflix.netlify.app','https://tinavngo.github.io']
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
