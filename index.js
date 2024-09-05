@@ -4,47 +4,48 @@ const morgan = require('morgan');
 const fs = require('fs');
 const path = require("path");
 const bodyParser = require('body-parser');
-const uuid = require('uuid');
 const { check, validationResult } = require('express-validator');
-
-// Importing models.js file + mongoose
 const mongoose = require('mongoose');
 const Models = require('./models.js');
+const cors = require('cors');
+// Import authentication, and passport module
+let auth = require('./auth.js')(app);
+const passport = require('passport');
+require('./passport');
 
 // Mongoose Models
 const Movies = Models.Movie;
 const Users = Models.User;
 
+// Create web server
+app = express();
 
 /*
 //local database
 mongoose.connect('mongodb://127.0.0.1:27017/myFlix', {useNewUrlParser: true, useUnifiedTopology: true});
 */
-
-/**
- * Online database
- */
 mongoose.connect(process.env.CONNECTION_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-/**
- * Create web server
- */
-app = express();
 
 /**
- * Middleware to parse incoming request bodies as JSON
+ * Middleware setup
  */
 app.use(morgan('common'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Morgan setup
+app.use(morgan('combined', { stream: accessLogStream }));
+app.use(bodyParser.json());
 
 /**
- * Cross Origin Resource Sharing
+ * Create write strean to "log.txt"
  */
-const cors = require('cors');
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), { flags: 'a' })
+
+// CORS configuration
 let allowedOrigins = ['http://localhost:8080', 'http://localhost:1234', 'https://cinematflix.netlify.app','https://tinavngo.github.io']
 app.use(cors({
   origin: (origin, callback) => {
@@ -59,35 +60,39 @@ app.use(cors({
 
 
 /**
- * Create write strean to "log.txt"
+ * Logger middleware to log request URLs
+ * 
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {Function} next - The next middleware function
  */
-const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), { flags: 'a' })
-
-
-// Morgan setup
-app.use(morgan('combined', { stream: accessLogStream }));
-app.use(bodyParser.json());
-
-// Import authentication, and passport module
-let auth = require('./auth.js')(app);
-const passport = require('passport');
-require('./passport');
-
-// Set Up Logger
 let Logger = (req, res, next) => {
   console.log(req.url);
   next();
 };
-
 app.use(Logger);
 
-// Welcome route  
+
+/**
+ * Welcome route.
+ * 
+ * @route {GET} /
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 app.get(
   "/", (req, res) => {
     res.send("Welcome to tinFlicks API!");
   });
 
-// READ -- Get movies must auth x
+
+/**
+ * Get all movies
+ * 
+ * @route {GET} / movies
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ */
 app.get(
   '/movies',
   async (req, res) => {
@@ -101,7 +106,14 @@ app.get(
       });
   });
 
-// READ -- Get movie title must auth x
+
+/**
+ * Get movie by title
+ * 
+ * @route {GET} /movies/:title
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object 
+ */
 app.get(
   "/movies/:title",
   passport.authenticate("jwt", { session: false }),
@@ -117,7 +129,14 @@ app.get(
   }
 );
 
-// READ -- Get users must auth x
+
+/**
+ * Get all users.
+ * 
+ * @route {GET} /users
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 app.get(
   "/users",
   passport.authenticate("jwt", { session: false }),
@@ -133,7 +152,14 @@ app.get(
   }
 );
 
-// CREATE -- account for new users x
+
+/**
+ * Create a new user.
+ * 
+ * @route {POST} /users
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 app.post(
   '/users', (req, res) => {
     [   // Validation logic here for request
@@ -177,7 +203,14 @@ app.post(
       })
   });
 
-//UPDATE -- user's info, by username  must auth x
+
+/**
+ * Update user information.
+ * 
+ * @route {PUT} /users/:Username
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 app.put(
   '/users/:Username',
   passport.authenticate('jwt', { session: false }),
@@ -225,21 +258,15 @@ app.put(
       });
   });
 
-// READ -- all users
-app.get('/users',
-  passport.authenticate('jwt', { session: false }),
-  async (req, res) => {
-    await Users.find()
-      .then((users) => {
-        res.status(201).json(users);
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).send('Error: ' + err);
-      });
-  });
 
-// READ -- user by username
+/**
+ * Read user by username
+ * 
+ * Get user by username.
+ * @route {GET} /users/:Username
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 app.get('/users/:Username',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
@@ -253,7 +280,14 @@ app.get('/users/:Username',
       });
   });
 
-//CREATE -- favorite movies
+
+/**
+ * Add a movie to user's favorites.
+ * 
+ * @route {POST} /users/:Username/movies/:movieID
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 app.post(
   '/users/:Username/movies/:movieID',
   passport.authenticate("jwt", { session: false }),
@@ -280,7 +314,13 @@ app.post(
   });
 
 
-// DELETE -- favorite movies
+/**
+ * Remove a movie from user's favorites.
+ * 
+ * @route {DELETE} /users/:Username/movies/:movieID
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 app.delete(
   '/users/:Username/movies/:movieID',
   passport.authenticate("jwt", { session: false }),
@@ -306,9 +346,14 @@ app.delete(
       });
   });
 
-
-//DELETE a user by username must auth x
-app.delete(
+  /**
+   * Remove user by username
+   * 
+   * @route {DELETE} /users/:Username
+   * @param {Object} req - The request object.
+   * @param {Object} res - The response object.
+   */
+  app.delete(
   '/users/:Username',
   passport.authenticate("jwt", { session: false }),
    async (req, res) => { 
@@ -330,7 +375,13 @@ app.delete(
   });
 
 
-//READ -- Get genre by genrename must auth x
+/**
+ * Get movie by genre
+ * 
+ * @route {GET} /movies/genres/:genreName
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 app.get(
   "/movies/genres/:genreName",
   passport.authenticate("jwt", { session: false }),
@@ -345,7 +396,14 @@ app.get(
       });
   });
 
-//READ -- Get director by directorname must auth x
+
+/**
+ * Get director by name
+ * 
+ * @route {GET} /movies/directors/:directorName
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 app.get(
   "/movies/directors/:directorName",
   passport.authenticate("jwt", { session: false }),
